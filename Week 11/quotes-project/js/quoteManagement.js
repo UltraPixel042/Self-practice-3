@@ -1,18 +1,26 @@
 //CRUD on quotes
-import { getItems } from "./myLib/fetch.Utils.js"
-
+import { getItems } from "./myLib/fetchUtils.js"
+const quoteURL = `${import.meta.env.VITE_APP_URL}/quotes`
 //GET Quotes
 async function loadQuotes() {
   try {
-    const quotes = await getItems(`${import.meta.env.VITE_APP_URL}/quotes`)
+    const quotes = await getItems(quoteURL)
     console.log(quotes)
     return quotes
   } catch (error) {
-    alert(error)
+    alert(`Quote: ${error}`)
   }
 }
-export { loadQuotes }
+async function deleteQuote() {
+  try{
+    const removeId = deleteItem(quoteURL, id)
+    return removeId
+  } catch(error){
+    alert(`Quote: ${error}`)
+  }
+}
 //Create Quote
 //Edit Quote
 //Delete Quote
- 
+
+export { loadQuotes, deleteQuote }

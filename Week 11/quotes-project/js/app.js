@@ -1,4 +1,4 @@
-import { loadQuotes } from "./quoteManagement.js"
+import { loadQuotes, deleteQuote } from "./quoteManagement.js"
 
 document.addEventListener("DOMContentLoaded", async () => {
   const quotes = await loadQuotes()
@@ -40,9 +40,18 @@ function newQuoteCard(quote) {
   deleteButtonEle.dataset.id = quote.id
   deleteButtonEle.textContent = "Delete"
   divActionsEle.appendChild(deleteButtonEle)
+  deleteButtonEle.addEventListener('click', handleDelete)
 
   divEle.appendChild(divActionsEle)
   return divEle //
+}
+
+function handleDelete(e){
+  const removeId = e.target.dataset.id
+  const ans = confirm(`Do you want to delete quote: ${removeId}`)
+  if(ans){
+    const delete =  
+  }
 }
 //create html quote cards
 //   <div class="quote-card" data-id="1">
