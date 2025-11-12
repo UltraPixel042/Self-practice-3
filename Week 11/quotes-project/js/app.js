@@ -1,5 +1,10 @@
-import { loadQuotes, addQuote, deleteQuote } from "./quoteManagement.js"
- 
+import {
+  loadQuotes,
+  deleteQuote,
+  addQuote,
+  editQuote,
+} from "./quoteManagement.js"
+
 document.addEventListener("DOMContentLoaded", async () => {
   const quotes = await loadQuotes()
   console.log(quotes)
@@ -23,17 +28,19 @@ function newQuoteCard(quote) {
   pAuthor.className = "author"
   pAuthor.textContent = quote.author
   divEle.appendChild(pAuthor)
- 
+
   //<div class="actions">
   const divActionsEle = document.createElement("div")
   divActionsEle.className = "actions"
- 
+
   //  <button class="edit" data-id="1">Edit</button>
   const editButtonEle = document.createElement("button")
   editButtonEle.className = "edit"
   editButtonEle.dataset.id = quote.id
   editButtonEle.textContent = "Edit"
   divActionsEle.appendChild(editButtonEle)
+  editButtonEle.addEventListener("click", handleEdit)
+
   // <button class="delete" data-id="1">delete</button>
   const deleteButtonEle = document.createElement("button")
   deleteButtonEle.className = "delete"
@@ -41,11 +48,19 @@ function newQuoteCard(quote) {
   deleteButtonEle.textContent = "Delete"
   divActionsEle.appendChild(deleteButtonEle)
   deleteButtonEle.addEventListener("click", handleDelete)
- 
+
   divEle.appendChild(divActionsEle)
   return divEle //
 }
- 
+function handleEdit(e) {
+  const editId = e.target.dataset.id
+  // console.log(editId)
+  const editQuoteDivEle = document.querySelector(`div[data-id="${editId}"]`)
+  const formEle = document.getElementById("quoteForm")
+  formEle.quoteId.value = editId //store edit id for handle edit case
+  formEle.content.value = editQuoteDivEle.children[0].textContent
+  formEle.author.value = editQuoteDivEle.children[1].textContent
+}
 async function handleDelete(e) {
   //e=event object
   // console.log(e.target.dataset.id)
@@ -72,12 +87,53 @@ async function handleDelete(e) {
 }
 
 const formEle = document.getElementById("quoteForm")
-formEle.addEventListener("submit", handAddEdit)
-function handAddEdit(event){
+formEle.addEventListener("submit", handleAddEdit)
+
+async function handleAddEdit(event) {
   event.preventDefault()
-  console.log(formEle.quoteId.value)
-  console.log(formEle.content.value)
-  console.log(formEle.author.value)
+  const quoteId = formEle.quoteId.value
+  const newContent = formEle.content.value
+  const newAuthor = formEle.author.value
+
+  if (quoteId) {
+    //EDIT
+    try {
+      const updateQuote = await editQuote({
+        id: quoteId,
+        content: newContent,
+        author: newAuthor,
+      })
+      const updateQuoteDivEle = document.querySelector(
+        `div[data-id="${updateQuote.id}"]`
+      )
+      updateQuoteDivEle.children[0].textContent = updateQuote.content
+      updateQuoteDivEle.children[1].textContent = updateQuote.author
+    } catch (e) {
+      console.log(`App [Edit]: ${e.message}`)
+    }
+  } else {
+    //ADD
+    try {
+      //1. add new Item in the backend
+      const newQuote = await addQuote({
+        content: newContent,
+        author: newAuthor,
+      }) //{content:content, author:author}
+      //2. add new quote card
+      const newQuoteDivEle = newQuoteCard(newQuote)
+      const quoteListEle = document.getElementById("quoteList")
+      quoteListEle.appendChild(newQuoteDivEle)
+    } catch (e) {
+      alert(`App [Add]: ${e.message}`)
+    }
+  }
+
+  //3. clear form
+  formEle.quoteId.value = ""
+  formEle.content.value = ""
+  formEle.author.value = ""
+
+  //ADD
 }
 //create html quote cards
 //   <div class="quote-card" data-id="1">
@@ -88,3 +144,4 @@ function handAddEdit(event){
 //         <button class="delete" data-id="1">delete</button>
 //    </div>
 // </div>
+ 

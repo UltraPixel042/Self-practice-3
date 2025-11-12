@@ -25,9 +25,7 @@ async function getItems(url) {
     throw new Error(error.message)
   }
 }
-//POST
-//fetchUtils.js
-//ADD
+
 //POST
 async function addItem(url, item) {
   try {
@@ -47,16 +45,32 @@ async function addItem(url, item) {
 }
 
 //PUT
+async function editItem(url, item) {
+  try {
+    const res = await fetch(`${url}/${item.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(item),
+    })
+    if (res.status !== 200) throw new Error("Fail to edit item")
+    const editedItem = res.json()
+    return editedItem
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
 //DELETE
 async function deleteItem(url, id) {
-  try{
-    const res = await fetch(`${url}/${id}`, {method: 'DELETE'})
-    if(!res.ok) throw new Error("Fail to delete item")
-      return id
-  } catch(error){
-    throw new Error(error.message);
-} 
-  
+  try {
+    const res = await fetch(`${url}/${id}`, { method: "DELETE" })
+    if (!res.ok) throw new Error("Fail to delete item")
+    return id
+  } catch (error) {
+    throw new Error(error.message)
+  }
 }
 
-export { getItems, addItem, deleteItem }
+export { getItems, deleteItem, addItem, editItem }
+ 
