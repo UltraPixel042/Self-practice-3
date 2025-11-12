@@ -26,6 +26,26 @@ async function getItems(url) {
   }
 }
 //POST
+//fetchUtils.js
+//ADD
+//POST
+async function addItem(url, item) {
+  try {
+    const res = await fetch(`${url}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(item),
+    })
+    if (res.status !== 201) throw new Error("Fail to add item")
+    const addedItem = res.json()
+    return addedItem
+  } catch (error) {
+    throw new Error(error.message)
+  }
+}
+
 //PUT
 //DELETE
 async function deleteItem(url, id) {
@@ -39,4 +59,4 @@ async function deleteItem(url, id) {
   
 }
 
-export { getItems, deleteItem }
+export { getItems, addItem, deleteItem }

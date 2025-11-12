@@ -1,5 +1,5 @@
-import { loadQuotes, deleteQuote } from "./quoteManagement.js"
-
+import { loadQuotes, addQuote, deleteQuote } from "./quoteManagement.js"
+ 
 document.addEventListener("DOMContentLoaded", async () => {
   const quotes = await loadQuotes()
   console.log(quotes)
@@ -23,11 +23,11 @@ function newQuoteCard(quote) {
   pAuthor.className = "author"
   pAuthor.textContent = quote.author
   divEle.appendChild(pAuthor)
-
+ 
   //<div class="actions">
   const divActionsEle = document.createElement("div")
   divActionsEle.className = "actions"
-
+ 
   //  <button class="edit" data-id="1">Edit</button>
   const editButtonEle = document.createElement("button")
   editButtonEle.className = "edit"
@@ -40,18 +40,44 @@ function newQuoteCard(quote) {
   deleteButtonEle.dataset.id = quote.id
   deleteButtonEle.textContent = "Delete"
   divActionsEle.appendChild(deleteButtonEle)
-  deleteButtonEle.addEventListener('click', handleDelete)
-
+  deleteButtonEle.addEventListener("click", handleDelete)
+ 
   divEle.appendChild(divActionsEle)
   return divEle //
 }
-
-function handleDelete(e){
+ 
+async function handleDelete(e) {
+  //e=event object
+  // console.log(e.target.dataset.id)
   const removeId = e.target.dataset.id
-  const ans = confirm(`Do you want to delete quote: ${removeId}`)
-  if(ans){
-    const delete =  
+  const ans = confirm(`Do you want to delete quote: ${removeId} `)
+  if (ans) {
+    try {
+      //1. delete quote in the backend
+      const deletedId = await deleteQuote(removeId)
+      // console.log(deletedId)
+      //2. find remove quote div element
+      const removeQuoteDivEle = document.querySelector(
+        `div[data-id="${deletedId}"]`
+      )
+      // console.log(removeQuoteDivEle)
+      const quoteListEle = document.querySelector("#quoteList")
+      console.log(quoteListEle)
+      //3. delete quote div element
+      quoteListEle.removeChild(removeQuoteDivEle)
+    } catch (e) {
+      alert(`App: ${e.message}`)
+    }
   }
+}
+
+const formEle = document.getElementById("quoteForm")
+formEle.addEventListener("submit", handAddEdit)
+function handAddEdit(event){
+  event.preventDefault()
+  console.log(formEle.quoteId.value)
+  console.log(formEle.content.value)
+  console.log(formEle.author.value)
 }
 //create html quote cards
 //   <div class="quote-card" data-id="1">
@@ -62,4 +88,3 @@ function handleDelete(e){
 //         <button class="delete" data-id="1">delete</button>
 //    </div>
 // </div>
- 
